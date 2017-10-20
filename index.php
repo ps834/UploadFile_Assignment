@@ -144,6 +144,8 @@
     	public static function readCsv($fileName){
 
 
+    		$createTable = "<center><h4>The file " . substr($fileName,17) . " is as follows: </h4></center>";
+
 			//Open Table 
 			$createTable .= '<table border="1">';
 
