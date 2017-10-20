@@ -43,11 +43,13 @@
 		}
 	}
 
+
+
 	abstract class page{
 
 		protected $html;
 
-		//Open html 
+		//Open HTML 
 		public function __construct(){
 
 			$this->html .= '<html><body>';
@@ -55,12 +57,13 @@
 
 		//Closing HTML 
 		public function __destruct(){
+        	
         	$this->html .= '</body></html>';
 
         	//printing the results appended to HTML 
-        	printText::results($this->html);
+        	print($this->html);
 
-    }
+    	}
 
 	}
 
@@ -68,45 +71,46 @@
 	//Class to Upload a CSV file
 	class uploadCsv extends page {
 
-    public function get() {
+	    public function get() {
 
-    	//Call function to display Upload form
-    	$this->html .= uploadForm::displayUploadForm();
-    }
+	    	//Call function to display Upload form
+	    	$this->html .= uploadForm::displayUploadForm();
+	    }
 
-    //Uploading file to AFS directory
-    public function post(){
+	    //Uploading file to AFS directory
+	    public function post(){
 
-    	$directory = "uploadedCsvFiles/";
-    	$fileToSave = $directory . basename($_FILES["uploadedFile"]["name"]);
-    	$fileSize = $_FILES["uploadedFile"]["size"];
+	    	$directory = "uploadedCsvFiles/";
+	    	$fileToSave = $directory . basename($_FILES["uploadedFile"]["name"]);
+	    	$fileSize = $_FILES["uploadedFile"]["size"];
 
-    	//Check if Filesize is greater than Zero
-    	if($fileSize>0){
+	    	//Check if Filesize is greater than Zero
+	    	if($fileSize>0){
 
-    		//Upload the file to AFS
-    		if(move_uploaded_file($_FILES["uploadedFile"]["tmp_name"], $fileToSave)){
+	    		//Upload the file to AFS
+	    		if(move_uploaded_file($_FILES["uploadedFile"]["tmp_name"], $fileToSave)){
 
-    			//Call redirectPage csv file into HTML Table
-    			callHeader::redirectPage($fileToSave);
-    			
-    		}else{
-    			printText::results("Error while uploading File");
-    		}
-    	}else{
-    		printText::results("Please upload a CSV file");
-    	}
-    }
+	    			//Call redirectPage csv file into HTML Table
+	    			callHeader::redirectPage($fileToSave);
+	    			
+	    		}else{
+	    			print("Error while uploading File");
+	    		}
+	    	}else{
+	    		print("Please upload a CSV file");
+	    	}
+	    }
 
 	}
 
+
+	//Static function to create Upload form
 	class uploadForm{
 
-
-		//Creating Upload form
 		public static function displayUploadForm(){
 				
-    	$createForm = '<form action = "index.php?page=uploadCsv" method = "post" enctype="multipart/form-data">';
+		$createForm = '<h1>Upload CSV File</h1><br>';
+    	$createForm .= '<form action = "index.php?page=uploadCsv" method = "post" enctype="multipart/form-data">';
 		$createForm .= '<input type = "file" name = "uploadedFile" id = "uploadedFile">';
 		$createForm .= '<input type = "submit" value = "Upload File" name = "submitFile">';
 		$createForm .= '</form>';
@@ -115,11 +119,11 @@
 	}
 
 
+	//Static function to redirect the page to displayTable class and passing the file path as parameter
 	class callHeader{
 
 		public static function redirectPage($fileToSave){
 
-			//Redirecting the page to displayTable class and passing the file path as parameter
     		header('Location: index.php?page=displayTable&filename=' . $fileToSave);
 		}
 	}
@@ -130,11 +134,18 @@
 
 		public function get(){
 
-			//Open Table 
-			$this->html .= '<table border="1">';
-
 			//Get the filepath from the header passed as URL parameter 
 			$fileName = $_GET['filename'];
+			$this->html .= displayTable::  readCsv($fileName);
+    	  }
+
+
+    	//Static function to read the CSV file and display it as HTML Table
+    	public static function readCsv($fileName){
+
+
+			//Open Table 
+			$createTable .= '<table border="1">';
 
 			//Open the file present in that path
 			$fileToOpen = fopen($fileName, "r") or die("Unable to read the file");
@@ -148,24 +159,24 @@
        			 $size = sizeof($rowData);
 
        			 //Start of Row
-				 $this->html .= '<tr>';
+				 $createTable .= '<tr>';
 
 				 //Loop through the array to extract table cell values 
        			 foreach ($rowData as $value) {
 
        			 	//If first row then set it as Table header
        			 	if($i<=$size){	
-       			 		$this->html .= '<th>' . $value . '</th>';
+       			 		$createTable .= '<th>' . $value . '</th>';
  					}else{
 
  					//else set as table definitions 
- 						$this->html .= '<td>' . $value . '</td>';
+ 						$createTable .= '<td>' . $value . '</td>';
  					}
  					$i++;
        			}	
 
        		//End of Row
-       		$this->html .= '</tr>';
+       		$createTable .= '</tr>';
 
     		}
 
@@ -174,16 +185,11 @@
 
 
 			//End of Table
-			$this->html .= '</table>';
-    	  }
-		}
+			$createTable .= '</table>';
 
+			return $createTable;
+    	}
 
-		//Static function to print values
-		class printText{
-			public static function results($text){
-				print($text);
-			}
 		}
 
 ?>
