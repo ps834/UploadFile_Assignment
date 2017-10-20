@@ -70,17 +70,14 @@
 
     public function get() {
 
-    	$createForm = '<form action = "index.php?page=uploadCsv" method = "post" enctype="multipart/form-data">';
-		$createForm .= '<input type = "file" name = "uploadedFile" id = "uploadedFile">';
-		$createForm .= '<input type = "submit" value = "Upload File" name = "submitFile">';
-		$createForm .= '</form>';
-        $this->html .= $createForm;
+    	//Call function to display Upload form
+    	$this->html .= uploadForm::displayUploadForm();
     }
 
     //Uploading file to AFS directory
     public function post(){
 
-    	$directory = "/afs/cad/u/p/s/ps834/public_html/uploadFile/uploadedCsvFiles/";
+    	$directory = "uploadedCsvFiles/";
     	$fileToSave = $directory . basename($_FILES["uploadedFile"]["name"]);
     	$fileSize = $_FILES["uploadedFile"]["size"];
 
@@ -90,8 +87,9 @@
     		//Upload the file to AFS
     		if(move_uploaded_file($_FILES["uploadedFile"]["tmp_name"], $fileToSave)){
 
-    			//Redirecting the page to displayTable class and passing the file path as parameter
-    			header('Location: https://web.njit.edu/~ps834/uploadFile/index.php?page=displayTable&filename=' . $fileToSave);
+    			//Call redirectPage csv file into HTML Table
+    			callHeader::redirectPage($fileToSave);
+    			
     		}else{
     			printText::results("Error while uploading File");
     		}
@@ -99,8 +97,32 @@
     		printText::results("Please upload a CSV file");
     	}
     }
+
 	}
 
+	class uploadForm{
+
+
+		//Creating Upload form
+		public static function displayUploadForm(){
+				
+    	$createForm = '<form action = "index.php?page=uploadCsv" method = "post" enctype="multipart/form-data">';
+		$createForm .= '<input type = "file" name = "uploadedFile" id = "uploadedFile">';
+		$createForm .= '<input type = "submit" value = "Upload File" name = "submitFile">';
+		$createForm .= '</form>';
+    	return $createForm;
+		}
+	}
+
+
+	class callHeader{
+
+		public static function redirectPage($fileToSave){
+
+			//Redirecting the page to displayTable class and passing the file path as parameter
+    		header('Location: index.php?page=displayTable&filename=' . $fileToSave);
+		}
+	}
 
 	//Diplaying CSV as HTML Table
 	class displayTable extends page{
@@ -122,17 +144,14 @@
    			 while (!feof($fileToOpen)) {
 
    			 	//Read a line from the file
-       			 $line_of_text = fgets($fileToOpen);
-
-       			 //Divide the line at commas and save it as an array
-       			 $data = explode(",", $line_of_text);
-       			 $size = sizeof($data);
+       			 $rowData = fgetcsv($fileToOpen);
+       			 $size = sizeof($rowData);
 
        			 //Start of Row
 				 $this->html .= '<tr>';
 
 				 //Loop through the array to extract table cell values 
-       			 foreach ($data as $value) {
+       			 foreach ($rowData as $value) {
 
        			 	//If first row then set it as Table header
        			 	if($i<=$size){	
@@ -156,7 +175,7 @@
 
 			//End of Table
 			$this->html .= '</table>';
-    	}
+    	  }
 		}
 
 
