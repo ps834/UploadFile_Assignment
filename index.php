@@ -109,12 +109,15 @@
 
 		public static function displayUploadForm(){
 				
-		$createForm = '<h1>Upload CSV File</h1><br>';
-    	$createForm .= '<form action = "index.php?page=uploadCsv" method = "post" enctype="multipart/form-data">';
-		$createForm .= '<input type = "file" name = "uploadedFile" id = "uploadedFile">';
-		$createForm .= '<input type = "submit" value = "Upload File" name = "submitFile">';
-		$createForm .= '</form>';
-    	return $createForm;
+		
+	    	$createForm  = '<form action = "index.php?page=uploadCsv" method = "post" enctype="multipart/form-data">';
+	    	$createForm .= '<fieldset>';
+	    	$createForm .= '<legend style="padding-top:10px;"> <h1>Upload CSV File</h1> </legend>';
+			$createForm .= '<input type = "file" name = "uploadedFile" id = "uploadedFile">';
+			$createForm .= '<input type = "submit" value = "Upload File" name = "submitFile">';
+			$createForm .= '</fieldset>';
+			$createForm .= '</form>';
+	    	return $createForm;
 		}
 	}
 
@@ -147,7 +150,7 @@
     		$createTable = "<center><h4>The file " . substr($fileName,17) . " is as follows: </h4></center>";
 
 			//Open Table 
-			$createTable .= '<table border="1">';
+			$createTable .= '<table border="1" align="center">';
 
 			//Open the file present in that path
 			$fileToOpen = fopen($fileName, "r") or die("Unable to read the file");
